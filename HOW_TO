@@ -1,0 +1,36 @@
+#Change jenkins http port if you need to. Make sure none of your apps have same port as this
+sed -i 's/http_port=8082/http_port=<custom port>/' Dockerfile
+
+#you need to download  
+https://www.dropbox.com/s/lyv6eeo5267yw26/jenkins_home.tar?dl=0
+
+#Build jenkins custom docker image
+docker build -t <custom image name> .
+
+#Run the image using ephemeral storage (non persistence)
+docker run -d --name <container name> -p <host port>:<http_port you define earlier>  <custom image name>
+
+#Example 
+
+docker run -d --name jenkins -p 8082:8082 jenkins-custom
+
+
+#Run the image with persistent volume 
+
+docker run -d --name jenkins -p 8082:8082 -v jenkins:/var/jenkins_home jenkins-custom
+
+#Your jenkins home / workspace should be able to accessed in /var/lib/docker/volumes/jenkins directory on your Host
+
+
+#Accessing Jenkins
+
+Go to localhost:8082 or <host ip>:<custom port>
+default user: admin
+defult password: P@ssw0rd
+
+click on job "Pull-Build-and-Compile-code"
+click "enable"
+
+- you can specify different git url on "SCM" section
+- the poll scm will monitor your git repo every minute, and will trigger the build if something changed
+- in "Post Build" section you can define custom Deployment command & Check URL 
